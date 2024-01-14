@@ -1,0 +1,20 @@
+---
+
+- name: Skanowanie podsieci i dodanie hostow do inventory
+  hosts: localhost
+  gather_facts: no
+  vars:
+    subnet: "192.168.0.0/16"
+  tasks:
+    - name: Skanowanie podsieci
+      raw: fping -g {{ subnet }} -aq
+      register: scan_result
+      changed_when: false
+
+    - name: Aktualizacja inventory
+      add_host:
+        name: "{{ item }}"
+        groups: scanned_hosts
+      with_items: "{{ scan_result.stdout_lines }}"
+      loop_control:
+        loop_var: host_item
