@@ -1,0 +1,72 @@
+- name: Aktualizacja apt cache
+  apt:
+    update_cache: yes
+
+- name: Instalacja MySQL
+  package:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  when: db_type == 'mysql'
+  loop:
+    - default-mysql-server
+    - default-mysql-client
+    - python3-mysqldb
+    - default-libmysqlclient-dev
+  become: yes
+
+- name: Uruchomienie i aktywacja usługi MySQL
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Konfiguracja użytkownika root
+  mysql_user:
+    name: root
+    password: "{{haslo_root}}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    host: localhost
+    login_user: root
+    login_password: ''
+    state: present
+
+- name: Utworzenie użytkownika admin
+  mysql_user:
+    name: "{{uzytkownik}}"
+    password: "{{haslo}}"
+    priv: '*.*:ALL'
+    host: '%'
+    append_privs: yes
+    login_user: root
+    login_password: "{{haslo_root}}"
+    state: present
+
+- name: Utworzenie bazy danych
+  mysql_db:
+    name: "{{nazwa_bazy}}"
+    state: present
+    login_user: root
+    login_password: "{{haslo_root}}"
+
+- name: Instalacja wymaganych bibliotek
+  pip:
+    name: pexpect
+    executable: pip3
+  become_user: root
+
+
+- name: Bezpieczna instalacja MySQL
+  expect:
+        command: mysql_secure_installation
+        responses:
+          'Enter password for user root:': "{{haslo_root}}"
+          'Press y\|Y for Yes, any other key for No': 'Y'
+          'Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG': "{{ password_validation_policy }}"
+          'Change the password for root \? \(\(Press y\|Y for Yes, any other key for No\)': 'n'
+          'Remove anonymous users\? \(Press y\|Y for Yes, any other key for No\)': 'Y'
+          'Disallow root login remotely\? \(Press y\|Y for Yes, any other key for No\)': 'Y'
+          'Remove test database and access to it\? \(Press y\|Y for Yes, any other key for No\)': 'Y'
+          'Reload privilege tables now\? \(Press y\|Y for Yes, any other key for No\)': 'Y'
+  environment:
+        MYSQL_PWD: "{{haslo_root}}"

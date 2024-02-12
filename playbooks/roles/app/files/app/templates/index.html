@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Click Counter</title>
+</head>
+<body>
+    <h1>Click Counter</h1>
+    <button onclick="increment()">Click me</button>
+    <p>Click count: <span id="count">0</span></p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+
+        socket.on('count_update', function(data) {
+            document.getElementById('count').innerText = data.count;
+        });
+
+        function increment() {
+            fetch('/increment').then(response => {
+                if (response.ok) {
+                    // Brak potrzeby aktualizacji po naciśnięciu przycisku, ponieważ otrzymamy komunikat z serwera
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

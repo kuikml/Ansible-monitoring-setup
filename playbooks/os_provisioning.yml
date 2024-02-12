@@ -1,0 +1,34 @@
+---
+
+- name: Konfiguracja ssh
+  hosts: wszystkie
+  become: true
+  tags:
+    - ssh
+  roles:
+    - ssh
+
+- name: Konfiguracja serwerów aplikacyjnych
+  hosts: aplikacje
+  become: true
+  tags:
+    - app
+    - flask
+  roles:
+    - app
+
+- name: Konfiguracja serwerów www
+  hosts: serwery_www
+  become: true
+
+  roles:
+    - web
+
+
+- name: Konfiguracja baz danych
+  hosts: bazy
+  become: true
+
+  roles:
+    - db
+  

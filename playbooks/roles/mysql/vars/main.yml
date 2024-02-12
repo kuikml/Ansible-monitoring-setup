@@ -1,0 +1,5 @@
+haslo_root: test
+uzytkownik: root
+haslo: roottest
+nazwa_bazy: baza_testowa
+password_validation_policy: 1

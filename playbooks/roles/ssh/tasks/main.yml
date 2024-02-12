@@ -1,0 +1,26 @@
+---
+- name: Kopiowanie klucza ssh użytkownika vagrant
+  authorized_key:
+    user: "vagrant"
+    key: "{{ lookup('file', '/home/vagrant/.ssh/id_rsa.pub') }}"
+  become: true
+
+- name: Dodanie użytkownika vagrant do sudoers
+  lineinfile:
+    dest: "/etc/sudoers"
+    line: "vagrant ALL=(ALL:ALL) NOPASSWD: ALL"
+    validate: "visudo -cf %s"
+  become: true
+
+- name: Zablokowanie możliwości logowania po ssh na użytkownika root
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    line: "PermitRootLogin no"
+    regexp: "^#?PermitRootLogin"
+  become: true
+
+- name: Restart usługi SSH
+  service:
+    name: ssh
+    state: restarted
+  become: true

@@ -1,0 +1,22 @@
+[wszystkie:children]
+aplikacje
+bazy
+serwery_www
+monitoring
+
+[aplikacje]
+app01 ansible_host=192.168.35.35
+app02 ansible_host=192.168.35.36
+
+[bazy]
+db01 ansible_host=192.168.36.35
+db02 ansible_host=192.168.36.36
+
+[serwery_www]
+web01 ansible_host=192.168.34.35
+web02 ansible_host=192.168.34.36
+
+[monitoring]
+prometheus ansible_host=192.168.33.20
+grafana ansible_host=192.168.33.30
+

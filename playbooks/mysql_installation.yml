@@ -1,0 +1,10 @@
+---
+
+- name: Konfiguracja serwerów
+  hosts: Bazy
+  become: true
+  vars:
+    db_type: mysql
+  roles:
+    - mysql
+

@@ -1,0 +1,28 @@
+---
+- name: Instaluj MySQL
+  apt:
+    name: mariadb-server-10.5
+    state: present
+
+- name: Uruchom MySQL
+  service:
+    name: mysql
+    state: started
+
+- name: Install MySQL Python module
+  apt:
+    name: python3-mysqldb
+    state: present
+
+- name: Utwórz testową bazę danych
+  mysql_db:
+    name: testowa_baza
+    state: present
+
+- name: Utwórz użytkownika MySQL
+  mysql_user:
+    name: testowy_uzytkownik
+    password: haslo
+    priv: '*.*:ALL'
+    state: present
+

@@ -1,0 +1,27 @@
+from flask import Flask, render_template
+from flask_socketio import SocketIO
+
+app = Flask(__name__)
+socketio = SocketIO(app)
+
+counter = 0
+
+@app.route('/')
+def index():
+    return render_template('index.html', count=counter)
+
+@app.route('/increment')
+def increment():
+    global counter
+    counter += 1
+    socketio.emit('count_update', {'count': counter}, namespace='/test')
+    return 'Incremented'
+
+@socketio.on('connect', namespace='/test')
+def test_connect():
+    global counter
+    socketio.emit('count_update', {'count': counter}, namespace='/test')
+
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0', port=80)
+
