@@ -2,7 +2,8 @@
 aplikacje
 bazy
 serwery_www
-monitoring
+prom
+graf
 
 [aplikacje]
 app01 ansible_host=192.168.35.35
@@ -16,7 +17,9 @@ db02 ansible_host=192.168.36.36
 web01 ansible_host=192.168.34.35
 web02 ansible_host=192.168.34.36
 
-[monitoring]
+[prom]
 prometheus ansible_host=192.168.33.20
+
+[graf]
 grafana ansible_host=192.168.33.30
 

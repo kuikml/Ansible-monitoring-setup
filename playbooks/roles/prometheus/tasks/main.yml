@@ -1,0 +1,74 @@
+---
+- name: Stworzenie grupy prometheus
+  group:
+    name: prometheus
+    system: yes
+
+- name: Stworzenie użytkownika prometheus
+  user:
+    name: prometheus
+    system: yes
+    shell: /sbin/nologin
+    group: prometheus
+
+- name: Stworzenie katalogów
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+  loop:
+    - /etc/prometheus
+    - /var/lib/prometeus
+
+- name: Pobranie plików Prometheus
+  get_url:
+    url: "https://github.com/prometheus/prometheus/releases/download/v2.45.3/prometheus-2.45.3.linux-amd64.tar.gz"
+    dest: "/tmp/prometheus.tar.gz"
+
+- name: Rozpakowanie plików
+  unarchive:
+    src: "/tmp/prometheus.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
+
+- name: Przeniesienie plikiów konfiguracyjnych
+  command: "mv /tmp/prometheus-2.45.3.linux-amd64/prometheus /usr/local/bin && mv /tmp/prometheus-2.45.3.linux-amd64/promtool /usr/local/bin"
+  become: yes
+  become_user: root
+
+- name: Zmiana uprawnień plików Prometheus
+  command: "chown prometheus:prometheus /usr/local/bin/prometeus /usr/local/bin/promtool"
+  become: yes
+  become_user: root
+
+- name: Przeniesienie plikiów konfiguracyjnych
+  command: "mv /tmp/prometheus-2.45.3.linux-amd64/consoles /etc/prometheus && mv /tmp/prometheus-2.45.3.linux-amd64/console_libraries /etc/prometheus && mv /tmp/prometheus-2.45.3.linux-amd64/prometheus.yml /etc/prometheus"
+  become: yes
+  become_user: root
+
+- name: Zmiana uprawnień plików Prometheus
+  command: "chown -R prometheus:prometheus /etc/prometheus/consoles /etc/prometheus/console_libraries /var/lib/prometheus"
+  become: yes
+  become_user: root
+
+- name: Stworznie serwisu Prometheus
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+
+- name: Restart systemd
+  systemd:
+    daemon_reload: tes
+
+- name: Aktywuj i uruchom serwis Prometheus
+  systemd:
+    name: prometheus
+    enabled: yes
+    state: started
+
+- name: Otwarcie ruchu na port 9090 w UFW
+  ufw:
+    rule: allow
+    port: 9090

@@ -1,34 +1,16 @@
 ---
 
-- name: Konfiguracja ssh
+- name: Aktualizacja systemu
   hosts: wszystkie
   become: true
   tags:
-    - ssh
+    - update
   roles:
-    - ssh
+    - provisioning
 
-- name: Konfiguracja serwerów aplikacyjnych
-  hosts: aplikacje
+
+- name: Instalacja Prometheus
+  hosts: prom
   become: true
-  tags:
-    - app
-    - flask
   roles:
-    - app
-
-- name: Konfiguracja serwerów www
-  hosts: serwery_www
-  become: true
-
-  roles:
-    - web
-
-
-- name: Konfiguracja baz danych
-  hosts: bazy
-  become: true
-
-  roles:
-    - db
-  
+    - prometheus
